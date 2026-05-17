@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PixelCharm Outreach</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a38;
+    --accent: #7c5cfc;
+    --accent2: #fc5c7d;
+    --text: #f0f0f8;
+    --muted: #6b6b88;
+    --success: #3dd68c;
+    --warning: #f5a623;
+    --font: 'Syne', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(124,92,252,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124,92,252,0.03) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  }
+  .app { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 2rem; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-mark { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .logo-text { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+  .logo-sub { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-top: 1px; }
+  .header-stats { display: flex; gap: 2rem; }
+  .hstat { text-align: right; }
+  .hstat-val { font-size: 22px; font-weight: 700; color: var(--accent); }
+  .hstat-label { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+  .tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 4px; margin-bottom: 2rem; width: fit-content; }
+  .tab { padding: 8px 20px; border-radius: 8px; border: none; background: transparent; color: var(--muted); font-family: var(--font); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .tab.active { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .tab:hover:not(.active) { color: var(--text); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; margin-bottom: 1.5rem; align-items: end; }
+  .field label { display: block; font-size: 11px; font-family: var(--mono); color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .field input, .field select { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-family: var(--font); font-size: 14px; outline: none; transition: border-color 0.2s; }
+  .field input:focus, .field select:focus { border-color: var(--accent); }
+  .field select option { background: var(--surface2); }
+  .btn { padding: 10px 24px; border-radius: 8px; border: none; font-family: var(--font); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), #9b7cfd); color: white; }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-ghost:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-success { background: var(--success); color: #0a0a0f; }
+  .btn-success:hover { opacity: 0.9; }
+  .btn-success:disabled { opacity: 0.4; cursor: not-allowed; }
+  .api-notice { background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.3); border-radius: 10px; padding: 14px 18px; margin-bottom: 1.5rem; font-size: 13px; color: var(--warning); display: flex; align-items: flex-start; gap: 10px; line-height: 1.6; }
+
+  /* Section dividers */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 1.5rem 0 0.75rem;
+  }
+  .section-title {
+    font-size: 12px; font-family: var(--mono); text-transform: uppercase;
+    letter-spacing: 1px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-title.with-contact { color: var(--success); }
+  .section-title.without-contact { color: var(--muted); }
+  .section-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot-green { background: var(--success); }
+  .dot-muted { background: var(--muted); }
+  .section-count { font-size: 11px; font-family: var(--mono); color: var(--muted); }
+
+  .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+  .results-count { font-size: 13px; font-family: var(--mono); color: var(--muted); }
+  .results-actions { display: flex; gap: 8px; }
+  .lead-grid { display: grid; gap: 8px; margin-bottom: 1rem; }
+  .lead-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1.1rem; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; transition: border-color 0.2s; }
+  .lead-card:hover { border-color: rgba(124,92,252,0.4); }
+  .lead-card.selected { border-color: var(--accent); background: rgba(124,92,252,0.05); }
+  .lead-card.contacted { opacity: 0.5; }
+  .lead-check { width: 18px; height: 18px; border: 1.5px solid var(--border); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+  .lead-check.checked { background: var(--accent); border-color: var(--accent); }
+  .lead-check.checked::after { content: '✓'; font-size: 11px; color: white; }
+  .lead-info { min-width: 0; }
+  .lead-name { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .lead-meta { font-size: 12px; font-family: var(--mono); color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px; }
+  .lead-meta-item { display: flex; align-items: center; gap: 4px; }
+  .contact-badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+  .badge-phone { background: rgba(61,214,140,0.12); color: var(--success); }
+  .badge-website { background: rgba(124,92,252,0.12); color: #9b7cfd; }
+  .badge-none { background: rgba(107,107,136,0.1); color: var(--muted); }
+  .badge-outdated { background: rgba(245,166,35,0.12); color: var(--warning); }
+  .badge-modern { background: rgba(61,214,140,0.08); color: var(--muted); }
+  .section-title.outdated-contact { color: var(--warning); }
+  .section-dot.dot-amber { background: var(--warning); }
+
+  .loading { text-align: center; padding: 3rem; color: var(--muted); font-family: var(--mono); font-size: 13px; }
+  .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin-bottom: 10px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .progress-label { font-size: 12px; font-family: var(--mono); color: var(--muted); margin-top: 8px; }
+
+  .email-compose { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+  .email-header-bar { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .email-recipient { font-size: 13px; font-weight: 600; }
+  .email-to { font-size: 12px; font-family: var(--mono); color: var(--muted); }
+  .email-subject-line { padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--muted); font-family: var(--mono); }
+  .email-subject-line span { color: var(--text); }
+  .email-body-text { padding: 16px; font-size: 13px; line-height: 1.8; white-space: pre-wrap; color: var(--text); min-height: 120px; }
+  .email-actions { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center; }
+  .email-status { font-size: 11px; font-family: var(--mono); margin-left: auto; }
+
+  .tracker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 2rem; }
+  .tracker-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .tracker-stat-val { font-size: 32px; font-weight: 800; color: var(--accent); }
+  .tracker-stat-label { font-size: 12px; font-family: var(--mono); color: var(--muted); margin-top: 4px; }
+  .contact-log { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .contact-log-header { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 600; font-family: var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .contact-row { padding: 12px 16px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr auto auto; align-items: center; gap: 12px; font-size: 13px; }
+  .contact-row:last-child { border-bottom: none; }
+  .contact-biz { font-weight: 500; }
+  .contact-email-addr { font-family: var(--mono); color: var(--muted); font-size: 12px; }
+  .contact-date { font-family: var(--mono); color: var(--muted); font-size: 11px; }
+  .badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-family: var(--mono); }
+  .badge-sent { background: rgba(61,214,140,0.12); color: var(--success); }
+  .badge-draft { background: rgba(124,92,252,0.12); color: var(--accent); }
+
+  .settings-grid { display: grid; gap: 16px; max-width: 600px; }
+  .setting-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .setting-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .setting-desc { font-size: 12px; color: var(--muted); margin-bottom: 12px; font-family: var(--mono); }
+  .setting-input-row { display: flex; gap: 8px; }
+  .setting-input-row input { flex: 1; }
+
+  .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; font-size: 13px; display: flex; align-items: center; gap: 10px; z-index: 1000; transform: translateY(20px); opacity: 0; transition: all 0.3s; max-width: 320px; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-color: rgba(61,214,140,0.4); }
+  .toast.error { border-color: rgba(252,92,125,0.4); }
+  .empty { text-align: center; padding: 4rem 2rem; color: var(--muted); }
+  .empty-icon { font-size: 40px; margin-bottom: 1rem; opacity: 0.4; }
+  .empty-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .empty-desc { font-size: 13px; font-family: var(--mono); }
+  .progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 1.5rem; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+  .generate-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .generate-bar-info { flex: 1; min-width: 200px; }
+  .generate-bar-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .generate-bar-sub { font-size: 12px; font-family: var(--mono); color: var(--muted); }
+  .fetch-progress { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+  .fetch-progress-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+  .fetch-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+  .fetch-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 3px; transition: width 0.3s ease; }
+  .fetch-label { font-size: 12px; font-family: var(--mono); color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">
+      <div class="logo-mark">✦</div>
+      <div>
+        <div class="logo-text">PixelCharm Outreach</div>
+        <div class="logo-sub">Lead Gen · AI Emails · Gmail Drafts</div>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="hstat"><div class="hstat-val" id="stat-leads">0</div><div class="hstat-label">leads found</div></div>
+      <div class="hstat"><div class="hstat-val" id="stat-drafted">0</div><div class="hstat-label">drafted</div></div>
+      <div class="hstat"><div class="hstat-val" id="stat-contacted">0</div><div class="hstat-label">contacted</div></div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('find')">🔍 Find Leads</button>
+    <button class="tab" onclick="switchTab('emails')">✉️ Emails</button>
+    <button class="tab" onclick="switchTab('tracker')">📊 Tracker</button>
+    <button class="tab" onclick="switchTab('settings')">⚙️ Settings</button>
+  </div>
+
+  <!-- FIND LEADS -->
+  <div class="panel active" id="panel-find">
+    <div class="api-notice" id="server-banner" style="cursor:default">
+      <span style="display:flex;align-items:center;gap:10px;width:100%"><span id="server-dot" style="width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0"></span><span id="server-msg">Checking scraper status...</span></span>
+    </div>
+    <div class="search-grid">
+      <div class="field">
+        <label>City / Region</label>
+        <input type="text" id="search-location" placeholder="e.g. Halifax, Nova Scotia" value="Halifax, Nova Scotia">
+      </div>
+      <div class="field">
+        <label>Filter by Industry <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+        <input type="text" id="search-industry" placeholder="Leave blank for all businesses">
+      </div>
+      <div class="field">
+        <label>Max Results</label>
+        <select id="search-limit">
+          <option value="10">10 leads</option>
+          <option value="20" selected>20 leads</option>
+          <option value="40">40 leads</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="searchLeads()" id="search-btn">Search</button>
+    </div>
+    <div id="search-results">
+      <div class="empty">
+        <div class="empty-icon">🗺️</div>
+        <div class="empty-title">Find local businesses</div>
+        <div class="empty-desc">Enter a location and hit Search — results split into businesses with and without contact info</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMAILS -->
+  <div class="panel" id="panel-emails">
+    <div id="emails-empty" class="empty">
+      <div class="empty-icon">✉️</div>
+      <div class="empty-title">No emails generated yet</div>
+      <div class="empty-desc">Select leads in Find Leads and click "Generate & Draft Emails"</div>
+    </div>
+    <div id="emails-list"></div>
+  </div>
+
+  <!-- TRACKER -->
+  <div class="panel" id="panel-tracker">
+    <div class="tracker-grid">
+      <div class="tracker-stat"><div class="tracker-stat-val" id="t-total">0</div><div class="tracker-stat-label">total leads found</div></div>
+      <div class="tracker-stat"><div class="tracker-stat-val" id="t-drafted">0</div><div class="tracker-stat-label">drafts created</div></div>
+      <div class="tracker-stat"><div class="tracker-stat-val" id="t-contacted">0</div><div class="tracker-stat-label">marked contacted</div></div>
+    </div>
+    <div class="contact-log">
+      <div class="contact-log-header">Contact History</div>
+      <div id="contact-log-body"><div class="empty" style="padding:2rem"><div class="empty-desc">No contacts yet</div></div></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="panel" id="panel-settings">
+    <div class="settings-grid">
+      <div class="setting-card">
+        <div class="setting-title">Your Details</div>
+        <div class="setting-desc">Used in email signatures</div>
+        <div class="field" style="margin-bottom:10px"><label>Your Name</label><input type="text" id="s-name" placeholder="Chattan Gillis" value="Chattan Gillis"></div>
+        <div class="field" style="margin-bottom:10px"><label>Phone</label><input type="text" id="s-phone" placeholder="782-321-3257" value="782-321-3257"></div>
+        <div class="field" style="margin-bottom:10px"><label>Website</label><input type="text" id="s-website" placeholder="pixelcharm.company" value="pixelcharm.company"></div>
+        <button class="btn btn-ghost" onclick="saveSettings()">Save</button>
+      </div>
+      <div class="setting-card">
+        <div class="setting-title">Anthropic API Key</div>
+        <div class="setting-desc">Required to write AI-personalized emails · Get one at console.anthropic.com</div>
+        <div class="setting-input-row"><input type="password" id="s-anthropic" placeholder="sk-ant-..."><button class="btn btn-ghost" onclick="saveAnthropicKey()">Save</button></div>
+      </div>
+      <div class="setting-card">
+        <div class="setting-title">How to run the scraper</div>
+        <div class="setting-desc">No API keys needed — just run the local server once</div>
+        <ol style="font-size:13px;line-height:2;padding-left:1.2rem;color:var(--text)">
+          <li>Install deps: <code style="font-family:var(--mono);font-size:12px;color:var(--accent)">pip install playwright flask && python -m playwright install chromium</code></li>
+          <li>Run: <code style="font-family:var(--mono);font-size:12px;color:var(--accent)">python server.py</code></li>
+          <li>Come back here and search — results are real Google Maps data</li>
+        </ol>
+      </div>
+      <div class="setting-card">
+        <div class="setting-title">Gmail OAuth</div>
+        <div class="setting-desc">To auto-send drafts directly, connect Gmail via OAuth. For now use Claude.ai's Gmail connector to push drafts.</div>
+        <button class="btn btn-ghost" disabled>Connect Gmail (coming soon)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let leads = [];
+let selectedLeads = new Set();
+let generatedEmails = [];
+let contactHistory = JSON.parse(localStorage.getItem('pc_contacts') || '[]');
+let settings = JSON.parse(localStorage.getItem('pc_settings') || '{}');
+
+if (settings.name) document.getElementById('s-name').value = settings.name;
+if (settings.phone) document.getElementById('s-phone').value = settings.phone;
+if (settings.website) document.getElementById('s-website').value = settings.website;
+if (settings.anthropic) document.getElementById('s-anthropic').value = settings.anthropic;
+if (settings.places) document.getElementById('s-places').value = settings.places;
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector('#panel-' + tab).classList.add('active');
+  event.target.classList.add('active');
+  if (tab === 'tracker') renderTracker();
+}
+
+function switchTabDirect(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector('#panel-' + tab).classList.add('active');
+  const tabs = ['find','emails','tracker','settings'];
+  document.querySelectorAll('.tab')[tabs.indexOf(tab)].classList.add('active');
+}
+
+function toast(msg, type) {
+  type = type || 'success';
+  const el = document.getElementById('toast');
+  el.textContent = (type === 'success' ? '✓ ' : '✗ ') + msg;
+  el.className = 'toast show ' + type;
+  setTimeout(function() { el.classList.remove('show'); }, 3000);
+}
+
+function saveSettings() {
+  settings.name = document.getElementById('s-name').value;
+  settings.phone = document.getElementById('s-phone').value;
+  settings.website = document.getElementById('s-website').value;
+  localStorage.setItem('pc_settings', JSON.stringify(settings));
+  toast('Settings saved');
+}
+
+function saveAnthropicKey() {
+  settings.anthropic = document.getElementById('s-anthropic').value;
+  localStorage.setItem('pc_settings', JSON.stringify(settings));
+  toast('Anthropic key saved');
+}
+
+function savePlacesKey() {
+  settings.places = document.getElementById('s-places').value;
+  localStorage.setItem('pc_settings', JSON.stringify(settings));
+  toast('Places key saved');
+}
+
+const SERVER = '';
+let serverReady = false;
+
+async function checkServer() {
+  try {
+    const res = await fetch(SERVER + '/health', { signal: AbortSignal.timeout(2000) });
+    const data = await res.json();
+    serverReady = data.status === 'ok';
+  } catch(e) {
+    serverReady = false;
+  }
+  updateServerBadge();
+  return serverReady;
+}
+
+function updateServerBadge() {
+  const dot = document.getElementById('server-dot');
+  const msg = document.getElementById('server-msg');
+  if (!dot || !msg) return;
+  if (serverReady) {
+    dot.style.background = 'var(--success)';
+    msg.innerHTML = '<strong style="color:var(--success)">Scraper online</strong> — ready to search Google Maps, no API keys needed';
+  } else {
+    dot.style.background = 'var(--warning)';
+    msg.innerHTML = '<strong style="color:var(--warning)">Scraper offline</strong> — double-click <strong>start.bat</strong> (Windows) or <strong>start.command</strong> (Mac) to launch it, then search';
+  }
+}
+
+async function waitForServer(maxWait) {
+  const start = Date.now();
+  while (Date.now() - start < maxWait) {
+    const ok = await checkServer();
+    if (ok) return true;
+    await new Promise(function(r) { setTimeout(r, 1500); });
+  }
+  return false;
+}
+
+async function searchLeads() {
+  const location = document.getElementById('search-location').value.trim();
+  const industry = document.getElementById('search-industry').value.trim();
+  const limit = parseInt(document.getElementById('search-limit').value);
+
+  if (!location) { toast('Enter a location', 'error'); return; }
+
+  const searchTerm = industry ? industry + ' in ' + location : 'small business in ' + location;
+  const btn = document.getElementById('search-btn');
+  btn.disabled = true;
+  const resultsEl = document.getElementById('search-results');
+
+  // Check if server is up; if not, show waiting message
+  const isUp = await checkServer();
+  if (!isUp) {
+    resultsEl.innerHTML =
+      '<div class="fetch-progress">' +
+        '<div class="fetch-progress-title">⏳ Starting scraper in the background...</div>' +
+        '<div class="fetch-bar"><div class="fetch-fill" id="wait-bar" style="width:0%;transition:width 20s linear"></div></div>' +
+        '<div class="fetch-label">Double-click <strong>start.bat</strong> (Windows) or <strong>start.command</strong> (Mac) if this takes more than 15 seconds</div>' +
+      '</div>';
+    setTimeout(function() {
+      const bar = document.getElementById('wait-bar');
+      if (bar) bar.style.width = '90%';
+    }, 100);
+    const started = await waitForServer(25000);
+    if (!started) {
+      toast('Scraper not found — launch start.bat or start.command first', 'error');
+      resultsEl.innerHTML =
+        '<div class="api-notice"><span>⚠️ <strong>Scraper not running.</strong> Double-click <strong>start.bat</strong> (Windows) or <strong>start.command</strong> (Mac) from the folder where you saved the files, wait a few seconds, then click Search again.</span></div>';
+      btn.disabled = false; btn.textContent = 'Search';
+      leads = generateDemoLeads(location, industry || 'business', limit);
+      renderLeads(); updateStats();
+      return;
+    }
+    toast('Scraper online!');
+  }
+
+  btn.textContent = 'Searching...';
+  resultsEl.innerHTML =
+    '<div class="fetch-progress">' +
+      '<div class="fetch-progress-title">🔍 Scraping Google Maps...</div>' +
+      '<div class="fetch-bar"><div class="fetch-fill" id="scrape-bar" style="width:0%;transition:width 55s linear"></div></div>' +
+      '<div class="fetch-label">Finding <em>' + (industry || 'all businesses') + '</em> in ' + location + ' — sit back, this takes ~30-60 seconds</div>' +
+    '</div>';
+  setTimeout(function() {
+    const bar = document.getElementById('scrape-bar');
+    if (bar) bar.style.width = '85%';
+  }, 200);
+
+  try {
+    const res = await fetch(SERVER + '/search?q=' + encodeURIComponent(searchTerm) + '&limit=' + limit);
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'Server error');
+    leads = data.leads;
+    toast('Found ' + leads.length + ' businesses!');
+  } catch(e) {
+    toast('Search error: ' + e.message, 'error');
+    leads = generateDemoLeads(location, industry || 'business', limit);
+  }
+
+  selectedLeads.clear();
+  renderLeads();
+  updateStats();
+  btn.disabled = false; btn.textContent = 'Search';
+}
+
+function generateDemoLeads(location, industry, limit) {
+  const city = location.split(',')[0].trim();
+  const ind = industry.replace(/\s/g, '');
+  const demos = [
+    { name: city + ' ' + capitalize(industry) + ' Co.', phone: '902-555-0101', website: 'https://' + ind.toLowerCase() + city.toLowerCase().replace(/\s/g,'') + '.ca' },
+    { name: 'The ' + capitalize(industry) + ' Place', phone: '902-555-0102', website: null },
+    { name: city + ' ' + capitalize(industry) + ' Studio', phone: null, website: 'https://the' + ind.toLowerCase() + 'place.ca' },
+    { name: 'Atlantic ' + capitalize(industry) + ' Group', phone: '506-555-0103', website: 'https://atlantic' + ind.toLowerCase() + '.ca' },
+    { name: capitalize(industry) + ' By Design', phone: null, website: null },
+    { name: 'East Coast ' + capitalize(industry), phone: '782-555-0104', website: 'https://eastcoast' + ind.toLowerCase() + '.ca' },
+    { name: city + ' ' + capitalize(industry) + ' Hub', phone: null, website: null },
+    { name: 'Nova ' + capitalize(industry) + ' Services', phone: '902-555-0105', website: 'https://nova' + ind.toLowerCase() + '.ca' },
+  ];
+  return demos.slice(0, Math.min(limit, demos.length)).map(function(d, i) {
+    return { id: 'demo-' + i, name: d.name, address: city + ', Atlantic Canada', category: industry, phone: d.phone, website: d.website, email: null, status: 'new' };
+  });
+}
+
+function capitalize(s) { return s.split(' ').map(function(w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(' '); }
+
+function hasContact(l) { return !!(l.phone || l.website || l.email); }
+
+function renderLeads() {
+  const el = document.getElementById('search-results');
+  if (!leads.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">No results</div><div class="empty-desc">Try a different search</div></div>';
+    return;
+  }
+
+  const alreadyContacted = new Set(contactHistory.map(function(c) { return c.name; }));
+  const withContact = leads.filter(hasContact);
+  const withoutContact = leads.filter(function(l) { return !hasContact(l); });
+
+  function cardHTML(l) {
+    const contacted = alreadyContacted.has(l.name);
+    const badges = [];
+    if (l.phone) badges.push('<span class="contact-badge badge-phone">📞 ' + l.phone + '</span>');
+    if (l.website) badges.push('<span class="contact-badge badge-website">🌐 ' + l.website.replace(/https?:\/\//, '').split('/')[0] + '</span>');
+    if (l.email) badges.push('<span class="contact-badge badge-phone">✉️ ' + l.email + '</span>');
+    if (!l.phone && !l.website && !l.email) badges.push('<span class="contact-badge badge-none">No contact info</span>');
+    return '<div class="lead-card ' + (contacted ? 'contacted' : '') + '" id="card-' + l.id + '">' +
+      '<div class="lead-check" id="check-' + l.id + '" onclick="toggleLead(\'' + l.id + '\')"></div>' +
+      '<div class="lead-info">' +
+        '<div class="lead-name">' + l.name + '</div>' +
+        '<div class="lead-meta">' +
+          '<span class="lead-meta-item" style="color:var(--muted)">' + l.address + '</span>' +
+          badges.join('') +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:11px;font-family:var(--mono);color:' + (contacted ? 'var(--success)' : 'var(--muted)') + '">' +
+        (contacted ? '✓ contacted' : '● new') +
+      '</div>' +
+    '</div>';
+  }
+
+  el.innerHTML =
+    '<div class="results-header">' +
+      '<div class="results-count">' + leads.length + ' businesses found</div>' +
+      '<div class="results-actions">' +
+        '<button class="btn btn-ghost" onclick="selectAllWithContact()">Select all with contact</button>' +
+        '<button class="btn btn-ghost" onclick="selectAll()">Select all</button>' +
+        '<button class="btn btn-primary" id="gen-btn" onclick="generateEmails()" disabled>Generate Emails (<span id="sel-count">0</span>)</button>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="section-header">' +
+      '<div class="section-title with-contact"><div class="section-dot dot-green"></div> With contact info</div>' +
+      '<div class="section-count">' + withContact.length + ' businesses</div>' +
+    '</div>' +
+    '<div class="lead-grid">' + (withContact.length ? withContact.map(cardHTML).join('') : '<div style="font-size:13px;font-family:var(--mono);color:var(--muted);padding:1rem">No businesses with contact info found</div>') + '</div>' +
+
+    '<div class="section-header">' +
+      '<div class="section-title without-contact"><div class="section-dot dot-muted"></div> No contact info found</div>' +
+      '<div class="section-count">' + withoutContact.length + ' businesses</div>' +
+    '</div>' +
+    '<div class="lead-grid">' + (withoutContact.length ? withoutContact.map(cardHTML).join('') : '<div style="font-size:13px;font-family:var(--mono);color:var(--muted);padding:1rem">All businesses had contact info</div>') + '</div>';
+}
+
+function toggleLead(id) {
+  if (selectedLeads.has(id)) {
+    selectedLeads.delete(id);
+    document.getElementById('check-' + id).classList.remove('checked');
+    document.getElementById('card-' + id).classList.remove('selected');
+  } else {
+    selectedLeads.add(id);
+    document.getElementById('check-' + id).classList.add('checked');
+    document.getElementById('card-' + id).classList.add('selected');
+  }
+  const count = selectedLeads.size;
+  document.getElementById('sel-count').textContent = count;
+  document.getElementById('gen-btn').disabled = count === 0;
+}
+
+function selectAllWithContact() {
+  leads.filter(hasContact).forEach(function(l) {
+    selectedLeads.add(l.id);
+    const ch = document.getElementById('check-' + l.id);
+    const cd = document.getElementById('card-' + l.id);
+    if (ch) ch.classList.add('checked');
+    if (cd) cd.classList.add('selected');
+  });
+  document.getElementById('sel-count').textContent = selectedLeads.size;
+  document.getElementById('gen-btn').disabled = selectedLeads.size === 0;
+}
+
+function selectAll() {
+  leads.forEach(function(l) {
+    selectedLeads.add(l.id);
+    const ch = document.getElementById('check-' + l.id);
+    const cd = document.getElementById('card-' + l.id);
+    if (ch) ch.classList.add('checked');
+    if (cd) cd.classList.add('selected');
+  });
+  document.getElementById('sel-count').textContent = selectedLeads.size;
+  document.getElementById('gen-btn').disabled = selectedLeads.size === 0;
+}
+
+async function generateEmails() {
+  const anthropicKey = settings.anthropic || document.getElementById('s-anthropic').value;
+  const myName = settings.name || 'Chattan Gillis';
+  const myPhone = settings.phone || '782-321-3257';
+  const myWebsite = settings.website || 'pixelcharm.company';
+
+  if (!anthropicKey) { toast('Add your Anthropic API key in Settings first', 'error'); switchTabDirect('settings'); return; }
+
+  const selected = leads.filter(function(l) { return selectedLeads.has(l.id); });
+  generatedEmails = selected.map(function(l) { return { lead: l, subject: '', body: '', status: 'queued' }; });
+
+  switchTabDirect('emails');
+  renderEmailsList();
+
+  for (let i = 0; i < generatedEmails.length; i++) {
+    generatedEmails[i].status = 'generating';
+    renderEmailsList();
+    try {
+      const result = await generateSingleEmail(anthropicKey, generatedEmails[i].lead, myName, myPhone, myWebsite);
+      generatedEmails[i].subject = result.subject;
+      generatedEmails[i].body = result.body;
+      generatedEmails[i].status = 'ready';
+    } catch(e) {
+      generatedEmails[i].status = 'error';
+      generatedEmails[i].body = 'Error generating — check your API key in Settings';
+    }
+    renderEmailsList();
+  }
+
+  updateStats();
+  toast(generatedEmails.length + ' emails generated!');
+}
+
+async function generateSingleEmail(apiKey, lead, myName, myPhone, myWebsite) {
+  const contactInfo = [];
+  if (lead.phone) contactInfo.push('Phone: ' + lead.phone);
+  if (lead.website) contactInfo.push('Website: ' + lead.website);
+
+  const hasNoWebsite = lead.category === 'no_website';
+  const isOutdated = lead.category === 'outdated_website';
+  const outdatedReasons = (lead.outdated_reasons || []).join(', ');
+  const websiteAngle = hasNoWebsite
+    ? 'They have NO website at all — pitch them on getting their first one.'
+    : isOutdated
+    ? 'Their website is outdated (' + outdatedReasons + ') — pitch a redesign, mention you noticed specific issues.'
+    : 'They have a modern website — pitch an upgrade or complementary service.';
+
+  const prompt = 'You are writing a cold outreach email on behalf of ' + myName + ' from PixelCharm, a web design studio for local businesses in Atlantic Canada.\n\nWrite a SHORT, personalized cold email pitching web design services to:\n- Business: ' + lead.name + '\n- Location: ' + lead.address + '\n- Website situation: ' + websiteAngle + '\n' + (lead.phone ? '- Phone: ' + lead.phone + '\n' : '') + '\nRules:\n- Max 5 sentences\n- Reference their specific website situation naturally\n- Offer a free mockup with no commitment\n- End with a soft call to action\n- Signature: ' + myName + ' / PixelCharm — Web Design for Local Businesses / ' + myWebsite + ' / ' + myPhone + '\n\nRespond ONLY in this exact JSON (no markdown):\n{"subject":"subject here","body":"body here with \\n for line breaks"}';
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 600, messages: [{ role: 'user', content: prompt }] })
+  });
+
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  const text = data.content[0].text.trim().replace(/```json|```/g, '').trim();
+  return JSON.parse(text);
+}
+
+function renderEmailsList() {
+  const el = document.getElementById('emails-list');
+  const empty = document.getElementById('emails-empty');
+  if (!generatedEmails.length) { empty.style.display = 'block'; el.innerHTML = ''; return; }
+  empty.style.display = 'none';
+
+  const readyCount = generatedEmails.filter(function(e) { return e.status === 'ready' || e.status === 'drafted'; }).length;
+  const total = generatedEmails.length;
+
+  el.innerHTML =
+    '<div class="generate-bar">' +
+      '<div class="generate-bar-info">' +
+        '<div class="generate-bar-title">' + readyCount + '/' + total + ' emails ready</div>' +
+        '<div class="generate-bar-sub">' + (readyCount === total ? 'All done — copy to Gmail or mark as drafted' : 'Generating with AI...') + '</div>' +
+      '</div>' +
+      (readyCount === total ? '<button class="btn btn-success" onclick="copyAllToClipboard()">📋 Copy All</button>' : '') +
+    '</div>' +
+    '<div class="progress-bar"><div class="progress-fill" style="width:' + Math.round((readyCount/total)*100) + '%"></div></div>' +
+    generatedEmails.map(function(e, i) {
+      return '<div class="email-compose">' +
+        '<div class="email-header-bar">' +
+          '<div><div class="email-recipient">' + e.lead.name + '</div>' +
+          '<div class="email-to">' + e.lead.address + (e.lead.phone ? ' · ' + e.lead.phone : '') + (e.lead.website ? ' · ' + e.lead.website.replace(/https?:\/\//,'').split('/')[0] : '') + '</div></div>' +
+          '<div style="display:flex;gap:8px;align-items:center">' +
+            '<div class="email-status">' + (e.status === 'generating' ? '⏳ writing...' : e.status === 'ready' ? '✓ ready' : e.status === 'drafted' ? '✓ drafted' : '◌ queued') + '</div>' +
+            (e.status === 'ready' ? '<button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="copyEmail(' + i + ')">Copy</button>' : '') +
+            (e.status === 'ready' ? '<button class="btn btn-success" style="font-size:12px;padding:6px 12px" onclick="markDrafted(' + i + ')">✓ Drafted</button>' : '') +
+          '</div>' +
+        '</div>' +
+        (e.subject ? '<div class="email-subject-line">Subject: <span>' + e.subject + '</span></div>' : '') +
+        '<div class="email-body-text">' + (e.status === 'generating' ? '✦ Writing personalized email...' : (e.body || '◌ Queued')) + '</div>' +
+      '</div>';
+    }).join('');
+}
+
+function copyEmail(i) {
+  const e = generatedEmails[i];
+  const contact = e.lead.phone || e.lead.website || 'find contact on their website';
+  const text = 'To: ' + contact + '\nSubject: ' + e.subject + '\n\n' + e.body;
+  navigator.clipboard.writeText(text).then(function() { toast('Copied to clipboard'); });
+}
+
+function copyAllToClipboard() {
+  const text = generatedEmails
+    .filter(function(e) { return e.status === 'ready' || e.status === 'drafted'; })
+    .map(function(e) { return 'To: ' + (e.lead.email || e.lead.phone || e.lead.website || '?') + '\nSubject: ' + e.subject + '\n\n' + e.body + '\n\n---'; })
+    .join('\n\n');
+  navigator.clipboard.writeText(text).then(function() { toast('All emails copied'); });
+}
+
+function markDrafted(i) {
+  generatedEmails[i].status = 'drafted';
+  const e = generatedEmails[i];
+  contactHistory.unshift({ name: e.lead.name, email: e.lead.phone || e.lead.website || '—', subject: e.subject, date: new Date().toLocaleDateString('en-CA'), status: 'draft' });
+  localStorage.setItem('pc_contacts', JSON.stringify(contactHistory));
+  renderEmailsList();
+  updateStats();
+  toast(e.lead.name + ' marked as drafted');
+}
+
+function renderTracker() {
+  const drafted = contactHistory.filter(function(c) { return c.status === 'draft'; }).length;
+  const sent = contactHistory.filter(function(c) { return c.status === 'sent'; }).length;
+  document.getElementById('t-total').textContent = leads.length;
+  document.getElementById('t-drafted').textContent = drafted;
+  document.getElementById('t-contacted').textContent = sent;
+  const log = document.getElementById('contact-log-body');
+  if (!contactHistory.length) { log.innerHTML = '<div class="empty" style="padding:2rem"><div class="empty-desc">No contacts yet</div></div>'; return; }
+  log.innerHTML = contactHistory.map(function(c, i) {
+    return '<div class="contact-row">' +
+      '<div class="contact-biz">' + c.name + '</div>' +
+      '<div class="contact-email-addr">' + (c.email || '—') + '</div>' +
+      '<div class="contact-date">' + c.date + '</div>' +
+      '<div style="display:flex;gap:6px;align-items:center">' +
+        '<span class="badge ' + (c.status === 'sent' ? 'badge-sent' : 'badge-draft') + '">' + c.status + '</span>' +
+        (c.status === 'draft' ? '<button class="btn btn-ghost" style="font-size:11px;padding:4px 8px" onclick="markSent(' + i + ')">Mark Sent</button>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function markSent(i) {
+  contactHistory[i].status = 'sent';
+  localStorage.setItem('pc_contacts', JSON.stringify(contactHistory));
+  renderTracker();
+  updateStats();
+  toast('Marked as sent');
+}
+
+function updateStats() {
+  document.getElementById('stat-leads').textContent = leads.length;
+  document.getElementById('stat-drafted').textContent = generatedEmails.filter(function(e) { return e.status === 'drafted'; }).length;
+  document.getElementById('stat-contacted').textContent = contactHistory.filter(function(c) { return c.status === 'sent'; }).length;
+}
+
+renderTracker();
+updateStats();
+checkServer();
+setInterval(checkServer, 10000);
+</script>
+</body>
+</html>
